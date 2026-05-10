@@ -32,7 +32,7 @@ export default function RootLayout({ children }) {
       }}
     >
       <html lang="en" suppressHydrationWarning>
-        <head />
+        {/* <head /> */}
         <body className={`${lora.variable} ${dmSans.variable} font-sans`}>
           <ThemeProvider
             attribute="class"

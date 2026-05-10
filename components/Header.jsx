@@ -1,11 +1,14 @@
+// 'use client'
 import { checkUser } from "@/lib/checkUser";
+// import {auth, currentUser} from "@clerk/nextjs";
 import { Button } from "./ui/button";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+// import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
 import RoleRedirect from "./RoleRedirect";
 import CreditButton from "./CreditButton";
 import { CalendarDays, Users } from "lucide-react";
+import { SignInButton, UserButton } from "@clerk/nextjs";
 
 const Header = async () => {
   const user = await checkUser();
@@ -25,50 +28,60 @@ const Header = async () => {
       {user && <RoleRedirect role={user.role} />}
 
       <div className="flex items-center gap-3">
-        <SignedOut>
-          <SignInButton mode="modal">
-            <Button variant="ghost">Sign in</Button>
-          </SignInButton>
-          <SignInButton mode="modal">
-            <Button variant="gold">Get started →</Button>
-          </SignInButton>
-        </SignedOut>
+        {!user ? (
+  <>
+    <SignInButton mode="modal">
+      <Button variant="ghost">Sign in</Button>
+    </SignInButton>
 
-        <SignedIn>
-          {user?.role === "INTERVIEWER" && (
-            <Button variant="ghost" asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
-          )}
+    <SignInButton mode="modal">
+      <Button variant="gold">Get started →</Button>
+    </SignInButton>
+  </>
+) : (
+  <>
+    {user?.role === "INTERVIEWER" && (
+      <Button variant="ghost" asChild>
+        <Link href="/dashboard">Dashboard</Link>
+      </Button>
+    )}
 
-          {user?.role === "INTERVIEWEE" && (
-            <>
-              <Button variant="ghost" asChild>
-                <Link href="/explore">
-                  <Users size={16} />
-                  <span className="hidden md:inline">Explore</span>
-                </Link>
-              </Button>
-              <Button variant="default" asChild>
-                <Link href="/appointments">
-                  <CalendarDays size={16} />
-                  <span className="hidden md:inline">My Appointments</span>
-                </Link>
-              </Button>
-            </>
-          )}
+    {user?.role === "INTERVIEWEE" && (
+      <>
+        <Button variant="ghost" asChild>
+          <Link href="/explore">
+            <Users size={16} />
+            <span className="hidden md:inline">Explore</span>
+          </Link>
+        </Button>
 
-          <CreditButton
-            role={user?.role === "INTERVIEWER" ? "INTERVIEWER" : "INTERVIEWEE"}
-            credits={
-              (user?.role === "INTERVIEWER"
-                ? user?.creditBalance
-                : user?.credits) ?? 0
-            }
-          />
+        <Button variant="default" asChild>
+          <Link href="/appointments">
+            <CalendarDays size={16} />
+            <span className="hidden md:inline">
+              My Appointments
+            </span>
+          </Link>
+        </Button>
+      </>
+    )}
 
-          <UserButton />
-        </SignedIn>
+    <CreditButton
+      role={
+        user?.role === "INTERVIEWER"
+          ? "INTERVIEWER"
+          : "INTERVIEWEE"
+      }
+      credits={
+        (user?.role === "INTERVIEWER"
+          ? user?.creditBalance
+          : user?.credits) ?? 0
+      }
+    />
+
+    <UserButton />
+  </>
+)}
       </div>
     </nav>
   );
